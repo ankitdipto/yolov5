@@ -462,10 +462,6 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
     def collate_fn(batch):
         img, label, path, shapes = zip(*batch)  # transposed
 
-        cannyMap = cv2.Canny(img,100,200)
-        (B,G,R) = cv2.split(img)
-        img = cv2.merge([R,G,B,cannyMap])
-
         for i, l in enumerate(label):
             l[:, 0] = i  # add target image index for build_targets()
         return torch.stack(img, 0), torch.cat(label, 0), path, shapes
@@ -473,10 +469,6 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
     @staticmethod
     def collate_fn4(batch):
         img, label, path, shapes = zip(*batch)  # transposed
-
-        cannyMap = cv2.Canny(img,100,200)
-        (B,G,R) = cv2.split(img)
-        img = cv2.merge([R,G,B,cannyMap])
 
         n = len(shapes) // 4
         img4, label4, path4, shapes4 = [], [], path[:n], shapes[:n]
@@ -510,9 +502,9 @@ def load_image(self, index):
         path = self.img_files[index]
         img = cv2.imread(path)  # BGR
 
-        # cannyMap = cv2.Canny(img,100,200)
-        # (B,G,R) = cv2.split(img)
-        # img = cv2.merge([R,G,B,cannyMap])
+        cannyMap = cv2.Canny(img,100,200)
+        (B,G,R) = cv2.split(img)
+        img = cv2.merge([R,G,B,cannyMap])
         
         assert img is not None, 'Image Not Found ' + path
         h0, w0 = img.shape[:2]  # orig hw
