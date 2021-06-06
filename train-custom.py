@@ -299,6 +299,8 @@ def train(hyp, opt, device, tb_writer=None):
 
                 # Plot
                 # if plots and ni < 3:
+                #     #imgs = imgs[...,:3]
+                #     print("modified images shape ",imgs.shape)
                 #     f = save_dir / f'train_batch{ni}.jpg'  # filename
                 #     Thread(target=plot_images, args=(imgs, targets, paths, f), daemon=True).start()
                 #     if tb_writer:
@@ -406,9 +408,9 @@ def train(hyp, opt, device, tb_writer=None):
                                               is_coco=is_coco)
 
             # Strip optimizers
-            for f in last, best:
-                if f.exists():
-                    strip_optimizer(f)  # strip optimizers
+            #for f in last, best:
+            #    if f.exists():
+            #        strip_optimizer(f)  # strip optimizers
             if wandb_logger.wandb:  # Log the stripped model
                 wandb_logger.wandb.log_artifact(str(best if best.exists() else last), type='model',
                                                 name='run_' + wandb_logger.wandb_run.id + '_model',
