@@ -103,6 +103,21 @@ class Bottleneck(nn.Module):
     def forward(self, x):
         return x + self.cv2(self.cv1(x)) if self.add else self.cv2(self.cv1(x))
 
+    """
+            Out
+             |
+             |
+             + (if shortcut = True and dims match !)
+            / \
+           /   \
+          X    CV2 [3x3] (expensive)
+                 \
+                  \
+                  CV1 [1x1] 
+                    \
+                     X
+    """
+
 
 class BottleneckCSP(nn.Module):
     # CSP Bottleneck https://github.com/WongKinYiu/CrossStagePartialNetworks
@@ -136,6 +151,21 @@ class C3(nn.Module):
 
     def forward(self, x):
         return self.cv3(torch.cat((self.m(self.cv1(x)), self.cv2(x)), dim=1))
+
+        """
+                      CV3 [1x1]
+                       |
+                       |
+                      :::
+                     /   \
+                    /     \
+                BottlNk   CV2 [1x1]
+                   |       |
+                   |       X
+                  CV1 [1x1]
+                   |
+                   X
+        """
 
 
 class C3TR(C3):
