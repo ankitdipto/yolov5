@@ -243,20 +243,18 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
                 args[j] = eval(a) if isinstance(a, str) else a  # eval strings
             except:
                 pass
-        #print(f,ch)
+
         n = max(round(n * gd), 1) if n > 1 else n  # depth gain
         if m in [Conv, GhostConv, Bottleneck, GhostBottleneck, SPP, DWConv, MixConv2d, Focus, CrossConv, BottleneckCSP,
                  C3, C3TR]:
             c1, c2 = ch[f], args[0]
             if c2 != no:  # if not output
-                #print("before division ",c2)
                 c2 = make_divisible(c2 * gw, 8)
-                #print("after division ",c2)
+
             args = [c1, c2, *args[1:]]
             if m in [BottleneckCSP, C3, C3TR]:
                 args.insert(2, n)  # number of repeats
                 n = 1
-                pass
         elif m is nn.BatchNorm2d:
             args = [ch[f]]
         elif m is Concat:
@@ -284,6 +282,78 @@ def parse_model(d, ch):  # model_dict, input_channels(3)
         ch.append(c2)
     return nn.Sequential(*layers), sorted(save)
 
+class MyYOLO(nn.Module):
+    def __init__(self):
+        super(MyYOLO,self).__init__()
+        self.focus_0 = Focus(3,32,3)        # 0-P1/2
+        self.conv_1 = Conv(32,64,3,2)       # 1-P2/4
+        self.CSP_block_2 = C3(64,64,1)
+        self.conv_3 = Conv(64,128,3,2)
+        self.CSP_block_4 = C3(128,128,3)
+        self.conv_5 = Conv(128,256,3,2)
+        self.CSP_block_6 = C3(256,256,3)
+        self.conv_7 = Conv(256,256,3)
+        
+        self.spp_8 = SPP(512,512,(5,9,13))
+        
+        self.CSP_block_direct_9 = C3(512,512,1,False)
+        self.conv_10 = Conv(512,256,1,1)
+        self.upsample_11 = nn.Upsample(None,2,'nearest')
+        self.concat_12 = Concat(1)   # -1 and 6
+        self.CSP_block_direct_13 = C3(512,256,1,False)
+        self.conv_14 = Conv(256,128,1,1)
+        self.upsample_15 = nn.Upsample(None,2,'nearest')
+        
+        self.concat_16 = Concat(1)   # -1 and 4
+        self.CSP_block_direct_17 = C3(256,128,1,False)
+        
+        self.conv_18 = Conv(128, 128, 3, 2)              
+        
+        self.concat_19 = Concat(1)   # -1 and 14                    
+        self.CSP_block_direct_20 = C3(256, 256, 1, False)          
+        
+        self.conv_21 = Conv(256, 256, 3, 2)              
+        
+        self.concat_22 = Concat(1)   # -1 and 10                           
+        self.CSP_block_direct_23 = C3(512, 512, 1, False)          
+        
+        self.detect_24 = Detect(80, 
+                            ([10, 13, 16, 30, 33, 23], 
+                             [30, 61, 62, 45, 59, 119],
+                             [116, 90, 156, 198, 373, 326]), 
+                           [128, 256, 512])
+    
+    def forward(self,x):
+        x1 = self.focus_0(x)
+        x2 = self.conv_1(x1)
+        x3 = self.CSP_block_2(x2)
+        x4 = self.conv_3(x3) 
+        x5 = self.CSP_block_4(x4)
+        x6 = self.conv_5(x5)
+        x7 = self.CSP_block_6(x6)
+        x8 = self.conv_7(x7)        
+        x9 = self.spp_8(x8)
+        
+        x10 = self.CSP_block_direct_9(x9)
+        x11 = self.conv_10(x10)
+        xupsample_11 = nn.Upsample(None,2,'nearest')
+        concat_12 = Concat(1)   # -1 and 6
+        CSP_block_direct_13 = C3(512,256,1,False)
+        conv_14 = Conv(256,128,1,1)
+        upsample_15 = nn.Upsample(None,2,'nearest')
+        
+        concat_16 = Concat(1)   # -1 and 4
+        CSP_block_direct_17 = C3(256,128,1,False)
+        
+        conv_18 = Conv(128, 128, 3, 2)              
+        
+        concat_19 = Concat(1)   # -1 and 14                    
+        CSP_block_direct_20 = C3(256, 256, 1, False)          
+        
+        conv_21 = Conv(256, 256, 3, 2)              
+        
+        concat_22 = Concat(1)   # -1 and 10                           
+        CSP_block_direct_23 = C3(512, 512, 1, False)   
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

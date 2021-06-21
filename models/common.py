@@ -110,12 +110,15 @@ class Bottleneck(nn.Module):
              + (if shortcut = True and dims match !)
             / \
            /   \
-          X    CV2 [3x3] (expensive)
-                 \
-                  \
-                  CV1 [1x1] 
-                    \
-                     X
+          |    CV2 [3x3] (expensive)
+          |     |
+          |     |
+          \    CV1 [1x1] 
+           \   /
+            \ /     
+             ^
+             |
+             X
     """
 
 
@@ -156,15 +159,20 @@ class C3(nn.Module):
                       CV3 [1x1]
                        |
                        |
-                      :::
+                     [:::]
                      /   \
                     /     \
-                BottlNk   CV2 [1x1]
+         n * Std BottlNk   CV2 [1x1]
                    |       |
-                   |       X
-                  CV1 [1x1]
-                   |
-                   X
+                   |       |
+                  CV1(1x1) |
+                   \       /
+                    \     /
+                     \   /
+                      \ /
+                       ^
+                       |
+                       X
         """
 
 
