@@ -59,6 +59,8 @@ def train(hyp, opt, device):
 
     # Configure
     #plots = not opt.evolve  # create plots
+    print("device is ",device)
+    print("rank is ",rank)
     cuda = device.type != 'cpu'
     init_seeds(2 + rank)
     with open(opt.data) as f:
@@ -392,6 +394,7 @@ if __name__ == '__main__':
     parser.add_argument('--save_period', type=int, default=-1, help='Log model after every "save_period" epoch')
     parser.add_argument('--artifact_alias', type=str, default="latest", help='version of dataset artifact to be used')
     opt = parser.parse_args()
+    opt.total_batch_size = opt.batch_size
 
     # Set DDP variables
     opt.world_size = int(os.environ['WORLD_SIZE']) if 'WORLD_SIZE' in os.environ else 1
