@@ -151,8 +151,9 @@ def plot_images(images, targets, paths=None, fname='images.jpg', names=None, max
         w = math.ceil(scale_factor * w)
 
     mosaic = np.full((int(ns * h), int(ns * w), 3), 255, dtype=np.uint8)  # init
+    print("mosaic shape",mosaic.shape)
     for i, img in enumerate(images):
-
+        print(img.shape)
         img = img[...,:3]
         assert img.shape[2] == 3
         
