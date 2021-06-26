@@ -1,0 +1,9 @@
+train: ../datasets/SKU-1K/train.txt  # 8219 images
+val: ../datasets/SKU-1K/val.txt  # 588 images
+test: ../datasets/SKU-1K/test.txt  # 2936 images
+
+# number of classes
+nc: 1
+
+# class names
+names: [ 'object' ]

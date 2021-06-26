@@ -1,0 +1,4 @@
+
+test: /home/ankit/Documents/ProductRecognition/datasets/GP-Test/images/
+nc: 1
+names: = ['object']
