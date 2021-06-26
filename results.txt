@@ -1,0 +1,5 @@
+Model                       P            R          mAP@0.5      mAP@0.5:0.95
+last-canny-3.pt             0.752       0.732       0.726         0.385
+best-canny-3.pt             0.752       0.732       0.726         0.385
+yolo-sku-1k-ep60(best).pt   0.617       0.741       0.655         0.356
+yolo-sku-1k-ep20-tn10.pt    0.717       0.712       0.677         0.392
