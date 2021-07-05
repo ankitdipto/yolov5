@@ -3,3 +3,5 @@ last-canny-3.pt             0.752       0.732       0.726         0.385
 best-canny-3.pt             0.752       0.732       0.726         0.385
 yolo-sku-1k-ep60(best).pt   0.617       0.741       0.655         0.356
 yolo-sku-1k-ep20-tn10.pt    0.717       0.712       0.677         0.392
+yolo-sku-1k-ep50-tn10.pt    0.781       0.758       0.758         0.463
+yolo-sku-1k-ep50.pt         0.632       0.717       0.627         0.33

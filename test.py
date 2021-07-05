@@ -99,7 +99,7 @@ def test(data,
     p, r, f1, mp, mr, map50, map, t0, t1 = 0., 0., 0., 0., 0., 0., 0., 0., 0.
     loss = torch.zeros(3, device=device)
     jdict, stats, ap, ap_class, wandb_images = [], [], [], [], []
-    for batch_i, (img, targets, paths, shapes) in enumerate(tqdm(dataloader, desc=s)):
+    for batch_i, (img, targets, paths, shapes) in enumerate(tqdm(dataloader,desc = s)):
         img = img.to(device, non_blocking=True)
         img = img.half() if half else img.float()  # uint8 to fp16/32
         img /= 255.0  # 0 - 255 to 0.0 - 1.0
@@ -109,6 +109,9 @@ def test(data,
         # Run model
         t = time_synchronized()
         out, train_out = model(img, augment=augment)  # inference and training outputs
+        #print(out.shape)
+        #print(len(train_out))
+
         t0 += time_synchronized() - t
 
         # Compute loss
@@ -120,6 +123,7 @@ def test(data,
         lb = [targets[targets[:, 0] == i, 1:] for i in range(nb)] if save_hybrid else []  # for autolabelling
         t = time_synchronized()
         out = non_max_suppression(out, conf_thres, iou_thres, labels=lb, multi_label=True, agnostic=single_cls)
+        #print(out[0].shape,out[1].shape,out[2].shape)
         t1 += time_synchronized() - t
 
         # Statistics per image
