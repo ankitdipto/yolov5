@@ -109,8 +109,8 @@ def test(data,
         # Run model
         t = time_synchronized()
         out, train_out = model(img, augment=augment)  # inference and training outputs
-        #print(out.shape)
-        #print(len(train_out))
+        
+        #print("len outs",len(train_out))  ---> The inference output is a list of 3 tensors, one tensor coming from each of the YOLO heads. There are 3 YOLO heads in total.
 
         t0 += time_synchronized() - t
 
@@ -123,7 +123,9 @@ def test(data,
         lb = [targets[targets[:, 0] == i, 1:] for i in range(nb)] if save_hybrid else []  # for autolabelling
         t = time_synchronized()
         out = non_max_suppression(out, conf_thres, iou_thres, labels=lb, multi_label=True, agnostic=single_cls)
-        #print(out[0].shape,out[1].shape,out[2].shape)
+
+        # After NMS the output is a batch of <BATCH-SIZE> predictions. Hence, len(out) = BATCH-SIZE
+        #print("The outs length",len(out))
         t1 += time_synchronized() - t
 
         # Statistics per image
@@ -222,7 +224,10 @@ def test(data,
             Thread(target=plot_images, args=(img, output_to_target(out), paths, f, names), daemon=True).start()
 
     # Compute statistics
+    print("Printing statistics length", len(stats))
     stats = [np.concatenate(x, 0) for x in zip(*stats)]  # to numpy
+    
+    print("stats[0] shape {0}, stats[1] shape {1}, stats[2] shape {2}".format(stats[0].shape,stats[1].shape,stats[2].shape))
     if len(stats) and stats[0].any():
         p, r, ap, f1, ap_class = ap_per_class(*stats, plot=plots, save_dir=save_dir, names=names)
         ap50, ap = ap[:, 0], ap.mean(1)  # AP@0.5, AP@0.5:0.95

@@ -1,6 +1,7 @@
 import argparse
 import time
 from pathlib import Path
+import numpy as np
 
 import cv2
 import torch
@@ -58,7 +59,15 @@ def detect(opt):
         model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))  # run once
     t0 = time.time()
     for path, img, im0s, vid_cap in dataset:
+        # img = torch.from_numpy(img)
+        # img = img.permute([2,1,0]).numpy()
+        # cannyMap = cv2.Canny(img,100,200)
+        # (R,G,B) = cv2.split(img)
+        # img = cv2.merge([R,G,B,cannyMap])
+        # print("The shape is ",img.shape)
+        #img = .permute(img,[]).to(device)
         img = torch.from_numpy(img).to(device)
+        # img = img.permute([2,1,0]).to(device)
         img = img.half() if half else img.float()  # uint8 to fp16/32
         img /= 255.0  # 0 - 255 to 0.0 - 1.0
         if img.ndimension() == 3:
@@ -71,6 +80,10 @@ def detect(opt):
         # Apply NMS
         pred = non_max_suppression(pred, opt.conf_thres, opt.iou_thres, opt.classes, opt.agnostic_nms,
                                    max_det=opt.max_det)
+
+        #pred = np.array(pred)
+        #print("hello hey there",len(pred))
+        #print("shape is ",pred[0].shape)
         t2 = time_synchronized()
 
         # Apply Classifier
@@ -101,6 +114,7 @@ def detect(opt):
 
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
+                    print(len(xyxy))
                     if save_txt:  # Write to file
                         xywh = (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()  # normalized xywh
                         line = (cls, *xywh, conf) if opt.save_conf else (cls, *xywh)  # label format

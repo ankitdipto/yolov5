@@ -517,7 +517,7 @@ def non_max_suppression(prediction, conf_thres=0.25, iou_thres=0.45, classes=Non
     time_limit = 10.0  # seconds to quit after
     redundant = True  # require redundant detections
     multi_label &= nc > 1  # multiple labels per box (adds 0.5ms/img)
-    merge = False  # use merge-NMS
+    merge = True  # use merge-NMS
 
     t = time.time()
     output = [torch.zeros((0, 6), device=prediction.device)] * prediction.shape[0]
@@ -671,6 +671,24 @@ def apply_classifier(x, model, img, im0):
 
     return x
 
+def apply_external_classifier(cropped_img, model = None):
+    # Apply a second stage classifier to yolo outputs
+    uniq_num = random.random()
+    category = random.sample(range(80),1)[0]
+    
+    cropped_img = cropped_img.permute(1,2,0)
+    cropped_img = cropped_img[:,:,[2,1,0]]
+    cropped_img = cropped_img.detach().cpu().numpy()
+    if category%39 == 0:
+        #print("Cropped image shape",cropped_img.shape)
+        cropped_img = (cropped_img * 255).astype(np.int32)
+        #cropped_img = cv2.cvtColor(cropped_img,cv2.COLOR_BGR2RGB)
+        #cropped_img = cv2.resize(cropped_img,(460,460))
+        #print("datatype min mean max",cropped_img.dtype,cropped_img.min(),cropped_img.mean(),cropped_img.max())
+        save_path = "my-utilities/test-" + str(uniq_num) + ".jpg"
+        #cv2.imwrite(save_path,cropped_img)
+        #print("Saving crop to",save_path)
+    return 0
 
 def save_one_box(xyxy, im, file='image.jpg', gain=1.02, pad=10, square=False, BGR=False, save=True):
     # Save image crop as {file} with crop size multiple {gain} and {pad} pixels. Save and/or return crop

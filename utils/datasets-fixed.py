@@ -343,9 +343,7 @@ class LoadStreams:  # multiple IP or RTSP cameras
 
 def img2label_paths(img_paths):
     # Define label paths as a function of image paths
-    #print("image paths",img_paths)
-    sa = os.sep + 'images' + os.sep 
-    sb = os.sep + 'labels' + os.sep  # /images/, /labels/ substrings
+    sa, sb = os.sep + 'images' + os.sep, os.sep + 'labels' + os.sep  # /images/, /labels/ substrings
     return ['txt'.join(x.replace(sa, sb, 1).rsplit(x.split('.')[-1], 1)) for x in img_paths]
 
 
@@ -365,11 +363,8 @@ class LoadImagesAndLabels(Dataset):  # for training/testing
         try:
             f = []  # image files
             for p in path if isinstance(path, list) else [path]:
-                print("path is ",p)
-                print("prefix is ",prefix)
                 p = Path(p)  # os-agnostic
                 if p.is_dir():  # dir
-                    print("p is a directory")
                     f += glob.glob(str(p / '**' / '*.*'), recursive=True)
                     # f = list(p.rglob('**/*.*'))  # pathlib
                 elif p.is_file():  # file
@@ -615,6 +610,11 @@ def load_image(self, index):
     if img is None:  # not cached
         path = self.img_files[index]
         img = cv2.imread(path)  # BGR
+
+        cannyMap = cv2.Canny(img,100,200)
+        (B,G,R) = cv2.split(img)
+        img = cv2.merge([R,G,B,cannyMap])
+        
         assert img is not None, 'Image Not Found ' + path
         h0, w0 = img.shape[:2]  # orig hw
         r = self.img_size / max(h0, w0)  # ratio
