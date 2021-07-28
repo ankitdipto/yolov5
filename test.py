@@ -224,10 +224,10 @@ def test(data,
             Thread(target=plot_images, args=(img, output_to_target(out), paths, f, names), daemon=True).start()
 
     # Compute statistics
-    print("Printing statistics length", len(stats))
+    #print("Printing statistics length", len(stats))
     stats = [np.concatenate(x, 0) for x in zip(*stats)]  # to numpy
     
-    print("stats[0] shape {0}, stats[1] shape {1}, stats[2] shape {2}".format(stats[0].shape,stats[1].shape,stats[2].shape))
+    #print("stats[0] shape {0}, stats[1] shape {1}, stats[2] shape {2}".format(stats[0].shape,stats[1].shape,stats[2].shape))
     if len(stats) and stats[0].any():
         p, r, ap, f1, ap_class = ap_per_class(*stats, plot=plots, save_dir=save_dir, names=names)
         ap50, ap = ap[:, 0], ap.mean(1)  # AP@0.5, AP@0.5:0.95

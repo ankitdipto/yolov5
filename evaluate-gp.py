@@ -159,13 +159,20 @@ def test(data,
     # print(stats[0][0].sum(),stats[0][0].shape,"actual no. of items",stats[0][2]) 
 
     AP = 0
-    for stat in stats:
-           AP += stat[0].sum()/len(stat[0])
+    AR = 0
+    for stat_img in stats:
+        if len(stat_img[0]):
+            AR += stat_img[0].sum()/stat_img[2]
+            AP += stat_img[0].sum()/len(stat_img[0])
+    
     print("len of stats",len(stats))
     AP = AP/len(stats)
-    print("Upper bound of average precision:",AP.item())
+    AR = AR/len(stats)
 
-
+    Fscore = (2 * AP * AR) / (AP + AR)
+    print("Upper bound of average precision @0.50:",AP.item())
+    print("Upper bound of average recall @0.50: ",AR.item())
+    print("Upper bound of average F score @0.50: ",Fscore.item())
 
        
     
